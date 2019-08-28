@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Bug Tracker</title>
+	<style>
+		body{
+			margin-left: 50px;
+		}
+	
+		section{
+			margin-bottom: 10px;
+		}
+
+		ol{
+			width: 500px;
+			list-style: none;
+			-webkit-padding-start : 0px;
+		}
+
+		.bugname{
+			cursor : pointer;
+			font-size: 18pt;
+		}
+		.stats{
+			font-size: 18pt;
+		}
+		.closed{
+			color : red;
+			text-decoration: line-through;
+			font-style: italic;
+			font-weight: bold;
+		}
+		li{
+			margin-bottom: 10px;
+			padding: 10px;
+			border-radius: 5px;
+			border : 2px solid gray;
+			background-color: #e7e7e7;
+		}
+
+	</style>
+	<script src="react.development.js"></script>
+	<script src="react-dom.development.js"></script>
+	<script src="babel.min.js"></script>
+	<script type="text/babel">
+
+		class EventEmitter{
+			_changeListeners = [];
+			
+			subscribe(listenerFn){
+				this._changeListeners.push(listenerFn)
+			}
+
+			emit(){
+				this._changeListeners.forEach(listenerFn => listenerFn());
+			}
+		}
+
+		class BugsCollection extends EventEmitter{
+			_list = [];
+
+			addNew(bugName){
+				let newBug = { name : bugName, createdAt : new Date()};
+				this._list.push(newBug);
+				this.emit();
+			}
+
+			getAll(){
+				return [...this._list];
+			}
+		}
+
+		class BugTracker extends React.Component{
+			state = { newBugName : '' }
+			render(){
+				let { collection } = this.props,
+					bugs = collection.getAll();
+				return(
+					<section>
+						<section className="stats">
+							<span>[ {bugs.length} ]</span>
+						</section>
+						<section className="edit">
+							<label htmlFor="">Bug Name :</label>
+							<input type="text" onChange={ evt => this.setState({newBugName : evt.target.value})} />
+							<input type="button" value="Add New" onClick={ evt => collection.addNew(this.state.newBugName)} />
+						</section>
+						<section className="list">
+							<ol>
+								{ bugs.map(bug => (<li>
+													<span className="bugname" >{bug.name}</span>
+													<div className="datetime">[Created At]</div>
+												</li>)
+										)
+								}
+							</ol>
+						</section>
+					</section>
+				)
+			}
+		}
+
+		var bugsCollection = new BugsCollection();
+
+		function renderApp(){
+			ReactDOM.render(<BugTracker collection={bugsCollection} />,
+				document.getElementById('root'));
+		}
+		renderApp();
+		bugsCollection.subscribe(renderApp);
+	</script>
+</head>
+<body>
+	<h1>BugTracker</h1>
+	<hr>
+	<div id="root">
+		
+	</div>
+</body>
+</html>
