@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>State Hook</title>
+	<script src="react.development.js"></script>
+	<script src="react-dom.development.js"></script>
+	<script src="babel.min.js"></script>
+	<script type="text/babel">
+		{/*class MyComponent extends React.Component{
+			state = { v1 : '', v2 : ''}
+			onT1Change = (evt) => {
+				this.setState({v1 : evt.target.value})
+			}
+			onT2Change = (evt) => {
+				this.setState({v2 : evt.target.value})
+			}
+			render(){
+				return(
+					<React.Fragment>
+						<input type="text" onChange={this.onT1Change} />
+						<div>{this.state.v1}</div>
+						<input type="text" onChange={this.onT2Change} />
+						<div>{this.state.v2}</div>
+					</React.Fragment>
+				)
+			}
+		}*/}
+
+		let useFormText = function(initialValue){
+			let [prevValue, setPrevValue] = React.useState(initialValue);
+			let [value, setValue] = React.useState(initialValue);
+			return {
+				prevValue, 
+				value, 
+				onChange : (evt) => {
+					setPrevValue(value);
+					setValue(evt.target.value) 
+				}
+			};
+		}
+		{/*let MyComponent = () => {
+			let [v1Value, v1SetValue] = React.useState('');
+			let [v2Value, v2SetValue] = React.useState('');
+			return(
+				<React.Fragment>
+					<input type="text" onChange={evt => v1SetValue(evt.target.value)} />
+					<div>{v1Value}</div>
+					<input type="text" onChange={evt => v2SetValue(evt.target.value)} />
+					<div>{v2Value}</div>
+				</React.Fragment>
+			)
+		}*/}
+
+		let MyComponent = () => {
+			let elem1 = useFormText('');
+			let elem2 = useFormText('');
+			return(
+				<React.Fragment>
+					<input type="text" value={elem1.value} onChange={elem1.onChange}/>
+					<div>{elem1.value}</div>
+					<div>{elem1.prevValue}</div>
+					<input type="text" value={elem2.value} onChange={elem2.onChange}/>
+					<div>{elem2.value}</div>
+				</React.Fragment>
+			)
+		}
+
+		ReactDOM.render(<MyComponent/>,
+			document.getElementById('root'));
+	</script>
+</head>
+<body>
+	<div id="root">
+
+	</div>
+</body>
+</html>

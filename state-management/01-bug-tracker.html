@@ -61,8 +61,13 @@
 			_list = [];
 
 			addNew(bugName){
-				let newBug = { name : bugName, createdAt : new Date()};
+				let newBug = { name : bugName, createdAt : new Date(), isClosed : false };
 				this._list.push(newBug);
+				this.emit();
+			}
+
+			toggle(bug){
+				bug.isClosed = !bug.isClosed;
 				this.emit();
 			}
 
@@ -75,11 +80,14 @@
 			state = { newBugName : '' }
 			render(){
 				let { collection } = this.props,
-					bugs = collection.getAll();
+					bugs = collection.getAll(),
+					closedCount = bugs.reduce((result, bug) => bug.isClosed ? ++result : result, 0 );
 				return(
 					<section>
 						<section className="stats">
-							<span>[ {bugs.length} ]</span>
+							<span className="closed">{closedCount}</span>
+							<span> / </span>
+							<span> {bugs.length} </span>
 						</section>
 						<section className="edit">
 							<label htmlFor="">Bug Name :</label>
@@ -88,16 +96,26 @@
 						</section>
 						<section className="list">
 							<ol>
-								{ bugs.map(bug => (<li>
-													<span className="bugname" >{bug.name}</span>
+								{ bugs.map((bug,index) => (<li key={index} >
+													<span className={'bugname ' + (bug.isClosed ? 'closed' : '')} onClick={() => collection.toggle(bug)} >
+														{bug.name}</span>
 													<div className="datetime">[Created At]</div>
 												</li>)
 										)
 								}
 							</ol>
+							<input type="button" value="Remove Closed" />
 						</section>
 					</section>
 				)
+			}
+		}
+
+		class Test extends React.Component{
+			state = { data : ''};
+			myHandler = (evt) => this.setState({data : evt.target.value});
+			render(){
+				return(<input type="text" onChange={this.myHandler} />)
 			}
 		}
 
@@ -107,8 +125,11 @@
 			ReactDOM.render(<BugTracker collection={bugsCollection} />,
 				document.getElementById('root'));
 		}
-		renderApp();
+		//renderApp();
 		bugsCollection.subscribe(renderApp);
+
+		ReactDOM.render(<Test/>,
+			document.getElementById('root'));
 	</script>
 </head>
 <body>
