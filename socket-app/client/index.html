@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Socket App</title>
+	<script src="react.development.js"></script>
+	<script src="react-dom.development.js"></script>
+	<script src="babel.min.js"></script>
+	<script type="text/babel">
+		
+		var { useEffect, useState } = React;
+
+		{/*class TestComponent extends React.Component{
+			componentDidMount(){
+				//asdfds
+			}
+			componentWillUnmount(){
+				
+			}
+			render(){
+				
+			}
+		}*/}
+
+		let TestComponent = () => {
+
+			let [testData, setTestData] = useState('');
+
+			useEffect(() => {
+				console.log('Component mounted');
+				return function(){
+					console.log('Component will be unmounted');
+				}
+			},[]);
+
+			useEffect(() => {
+				console.log('Data updated');
+			}, [testData]);
+
+			return(
+				<div>
+					<h1>Test Component</h1>
+					<input type="text" onChange={ evt => setTestData(evt.target.value) } />
+				</div>
+				)
+		}
+
+		var AppComponent = () => {
+			var [toggle, setToggle] = useState(false);
+			return (
+				<div>
+					<input type="button" value="Show / Hide" onClick={ evt => setToggle(!toggle) }/>
+					{toggle && <TestComponent />}
+				</div>
+			)
+		}
+		
+		ReactDOM.render(<AppComponent/>,
+			document.getElementById('root'));
+	</script>
+</head>
+<body>
+	<div id="root">
+		
+	</div>
+</body>
+</html>

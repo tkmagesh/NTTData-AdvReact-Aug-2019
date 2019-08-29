@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>No Context</title>
+    <script src="react.development.js"></script>
+    <script src="react-dom.development.js"></script>
+    <script src="babel.min.js"></script>
+    <script type="text/babel">
+        const ProductList = props => (
+            <div className="product-list">
+                <h2>Product list:</h2>
+                {/* Pass props twice */}
+                <Cars
+                    cars={props.cars}
+                    incrementCarPrice={props.incrementCarPrice}
+                    decrementCarPrice={props.decrementCarPrice}
+                />
+            </div>
+        );
+
+
+
+        const Cars = props => (
+            <React.Fragment>
+                <h4>Cars:</h4>
+                {/* Finally we can use data */}
+                {Object.keys(props.cars).map(carID => (
+                    <Car
+                        key={carID}
+                        name={props.cars[carID].name}
+                        price={props.cars[carID].price}
+                        incrementPrice={() => props.incrementCarPrice(carID)}
+                        decrementPrice={() => props.decrementCarPrice(carID)}
+                    />
+                ))}
+            </React.Fragment>
+        );
+
+        const Car = props => (
+            <React.Fragment>
+                <p>Name: {props.name}</p>
+                <p>Price: ${props.price}</p>
+                <button onClick={props.incrementPrice}>&uarr;</button>
+                <button onClick={props.decrementPrice}>&darr;</button>
+            </React.Fragment>
+        );
+
+        class App extends React.Component {
+            state = {
+                cars: {
+                    car001: { name: 'Honda', price: 100 },
+                    car002: { name: 'BMW', price: 150 },
+                    car003: { name: 'Mercedes', price: 200 }
+                }
+            };
+            incrementCarPrice = this.incrementCarPrice.bind(this);
+            decrementCarPrice = this.decrementCarPrice.bind(this);
+
+            incrementCarPrice(selectedID) {
+                // a simple method that manipulates the state
+                const cars = Object.assign({}, this.state.cars);
+                cars[selectedID].price = cars[selectedID].price + 1;
+                this.setState({
+                    cars
+                });
+            }
+
+            decrementCarPrice(selectedID) {
+                // a simple method that manipulates the state
+                const cars = Object.assign({}, this.state.cars);
+                cars[selectedID].price = cars[selectedID].price - 1;
+                this.setState({
+                    cars
+                });
+            }
+
+            render() {
+                return (
+                    <div className="App">
+                        <header className="App-header">
+                            <h1 className="App-title">Welcome to my web store</h1>
+                        </header>
+                        {/* Pass props twice */}
+                        <ProductList
+                            cars={this.state.cars}
+                            incrementCarPrice={this.incrementCarPrice}
+                            decrementCarPrice={this.decrementCarPrice}
+                        />
+                    </div>
+                );
+            }
+        }
+
+        ReactDOM.render(<App/>,
+            document.getElementById('root'));
+
+    </script>
+</head>
+<body>
+    <div id="root">
+        
+    </div>
+</body>
+</html>
+
+
+
