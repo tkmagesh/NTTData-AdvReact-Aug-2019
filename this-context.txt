@@ -1,0 +1,27 @@
+var emp = {
+	name : 'Magesh',
+	whoAmI : function(){
+		console.log('I am ', this.name);
+    }
+}
+
+//emp.whoAmI = emp.whoAmI.bind(emp)
+
+emp.whoAmI()
+
+
+var product = {
+	name : 'Pen'
+}
+
+product.whoAmI = emp.whoAmI;
+
+product.whoAmI()
+
+
+window.name = 'Chrome Browser'
+
+var whoAmI = emp.whoAmI;
+
+whoAmI()
+
