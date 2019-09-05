@@ -48,43 +48,50 @@
 		}*/}
 		let { useState, useEffect } = React;
 
-		let createSocketHook = function(url){
-				let socket = null;
-				if (!socket){
-					socket = io(url);
-				}
-				
-			return function(onNewMessageCallback){
-				let [ newMessage, setNewMessage ] = useState('');
-				useEffect(() => {
-				  	socket.on('chat message', (receivedMsg) => {
-						onNewMessageCallback(receivedMsg);
-					});
-				    return () => {
-				      socket.removeAllListeners();
-				      socket.close();
-				    };
-				  }, []);
+		let useSocket = function(socketUrl){
+			let messagesReducer = (state = [], action) => {
+				if (action.type === 'ADD_NEW')
+					return [...state, action.payload];
+				return state;
+			};
+			let [ messages, dispatch ] = React.useReducer(messagesReducer, []);
 
-				let sendMessage = () => {
-					socket.emit('chat message', newMessage)
-				};
-				return [setNewMessage, sendMessage];
-			}
+			let [ newMessage, setNewMessage ] = useState('');
+
+			let onChatMessageCallback = (receivedMsg) => {
+				dispatch({ type : 'ADD_NEW', payload : receivedMsg});
+			};
+
+			let socket = io(socketUrl);
+			
+			useEffect(() => {
+			  	socket.on('chat message', onChatMessageCallback);
+			    return () => {
+			      socket.removeAllListeners();
+			      socket.close();
+			    };
+			  }, []);			
+			let sendMessage = () => {
+				socket.emit('chat message', newMessage);
+			};
+			return [messages, setNewMessage, sendMessage];
 		}
+		
 
-		let useSocket = createSocketHook('http://localhost:3000');
 		let ChatClient = () => {
-			let [ messages, addNewMessage ] = useState('');
-			let [ setNewMessage, sendMessage ] = useSocket(receivedMessage => {
-				addNewMessage(messages + ' - ' + receivedMessage);
-			});
+			
+			
+			let [ messages, setNewMessage, sendMessage ] = useSocket('http://localhost:3000');
 
 			return(
 				<div>
+					<div>{messages.length}</div>
 					<input type="text" onChange={ evt => setNewMessage(evt.target.value) }/>
-					<input type="button" value="Send" onClick={ sendMessage }/>
-					<div>{messages}</div>
+					<input type="button" value="Send" onClick={ () => sendMessage() }/>
+					<ol>
+						{ messages.map(m => (<li>{m}</li>)) }
+					</ol>
+
 				</div>
 			)
 
